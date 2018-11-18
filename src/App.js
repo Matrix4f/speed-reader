@@ -5,8 +5,6 @@ import StartupScreen from './startup-screen';
 import './semantic/dist/semantic.min.css';
 import { Button, Card, Image, Container, CardGroup } from 'semantic-ui-react';
 import SelectDrillScreen from './select-drill-screen';
-import fs from 'fs';
-import cards from './cards';
 
 class App extends Component {
 

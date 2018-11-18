@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import fileDialog from 'file-dialog';
-import fs from 'fs';
 import './App.css';
 
 import './semantic/dist/semantic.min.css';
 import { Button, List, Icon, Transition, Form, Segment, Header, Popup } from 'semantic-ui-react';
+
+import cards from './cards';
 
 class CardDocumentListElement extends Component {
 
@@ -12,7 +13,9 @@ class CardDocumentListElement extends Component {
     super(props);
     this.state = {
       header: props.filename,
+      internalName: props.internalName,
       description: props.description,
+
       removeCallback: props.removeCallback,
       menuVisible: false,
       selected: true
@@ -42,13 +45,11 @@ class CardDocumentListElement extends Component {
   removeElement(e) {
     e.preventDefault();
 
-    this.state.removeCallback(this.state.header, this.state.description);
+    this.state.removeCallback(this.state.header, this.state.internalName, this.state.description);
   }
 
   sync(e) {
     e.preventDefault();
-
-
   }
 
   render() {
@@ -78,8 +79,6 @@ class CardDocumentListElement extends Component {
   }
 }
 
-const cardDatabases = [];
-
 class ImportCardsListElement extends Component {
   constructor(props) {
     super(props);
@@ -103,7 +102,14 @@ class ImportCardsListElement extends Component {
         
         var filename = file.name.substring(0, file.name.length - 5);
         var description = `${file.path} on ${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()-2000}`;
-        this.state.addCardCallback(filename, description);
+        var addCardCallback = this.state.addCardCallback;
+
+        cards.newCardDB(filename, description, file.path).then(db => {
+          console.log(`Added ${db.id.internalName}`);
+          addCardCallback(db.id.name, db.id.internalName, db.description);
+        }).done();
+        
+
       }
     });
   }
@@ -135,29 +141,49 @@ class CardsSelectorList extends Component {
       elements: [
         {
           filename: 'Internal Database',
+          internalName: 'db-0',
           description: 'A default set of cards that comes installed with Speed Reader'
         }
       ]
     };
+
   }
 
-  addCardListElement(filename, description) {
+  addCardListElement(filename, internalName, description) {
     this.setState({
       elements: this.state.elements.concat([{
         filename: filename,
+        internalName: internalName,
         description: description
       }])
     });
   }
 
-  removeCardListElement(filename, description) {
+  removeCardListElement(filename, internalName, description) {
+    var elem = this.state.elements.find(elem => (elem.filename == filename && elem.internalName == internalName && elem.description == description));
+    cards.removeDB(new cards.CardDBIdentifier(elem.filename, elem.internalName));
+
     this.setState({
       elements: this.state.elements.filter(elem => !(elem.filename == filename && elem.description == description))
     });
   }
 
   renderCardListElement(element) {
-    return (<CardDocumentListElement filename={element.filename} description={element.description} removeCallback={this.removeCardListElement}/>);
+    return (<CardDocumentListElement filename={element.filename} internalName={element.internalName} description={element.description} removeCallback={this.removeCardListElement}/>);
+  }
+
+  UNSAFE_componentWillMount() {
+    cards.loadDBs();
+
+    var newElements = [];
+    cards.getDBs().forEach(db => {  
+      newElements.push({
+        filename: db.id.name,
+        internalName: db.id.internalName,
+        description: db.description
+      });
+    });
+    this.setState({ elements: this.state.elements.concat(newElements)});
   }
 
   render() {
@@ -171,6 +197,22 @@ class CardsSelectorList extends Component {
 }
 
 class SelectDrillScreen extends Component {
+
+  constructor(props) {
+    super(props);
+
+
+    this.state = {
+      readForward: true,
+      highlight: true
+    };
+  }
+
+  UNSAFE_componentWillMount() {
+    const fs = window.bypass.fs;
+    if (fs.existsSync(''));
+  }
+
   render() {
     return (
     <div className="ui very padded text left aligned container segment">
@@ -180,13 +222,13 @@ class SelectDrillScreen extends Component {
           color='black'
           content='Reading Direction'
           icon='sort amount down'
-          label={{ basic: true, pointing: 'left', content: 'Forward' }}
+          label={{ basic: true, pointing: 'left', content: this.state.readForward ? 'Forward':'Backward' }}
         />
         <Button
           color='yellow'
           content='Highlights'
           icon='align center'
-          label={{ basic: true, pointing: 'left', content: 'On' }}
+          label={{ basic: true, pointing: 'left', content: this.state.highlight ? 'On':'Off' }}
         />
 
         <h3 className="ui header">Cards from</h3>

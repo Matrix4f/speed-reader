@@ -1,8 +1,7 @@
 const cheerio = require('cheerio');
 const mammoth = require('mammoth');
-const fs = require('fs');
 
-const cardDatabases = [];
+var cardDatabases = [];
 
 function calculateWordCount(s){
     return s.replace(/(^\s*)|(\s*$)/gi,"") //exclude  start and end white-space
@@ -62,19 +61,37 @@ class Card {
     }
 }
 
-class CardDB {
-
-  constructor(name, internalName, cards) {
+class CardDBIdentifier {
+  constructor(name, internalName) {
     this.name = name;
     this.internalName = internalName;
-    this.cards = cards;
   }
 }
 
-function getCards(docx) {
-  return mammoth.convertToHtml({path: docx}).then(function(result){
+class CardDB {
+
+  constructor(id, description, cards) {
+    this.id = id;
+    this.description = description;
+    this.cards = cards;
+  }
+
+  loadCards() {
+    this.cards = getCardsFromJson(`src/assets/cards/userdbs/${this.id.internalName}.cards`);
+  }
+
+  unloadCards() {
+    this.cards = null;
+  }
+}
+
+function getCardsFromDocx(docx, arrayBuffer) {
+  return mammoth.convertToHtml({
+    path: docx,
+    arrayBuffer: arrayBuffer
+  }).then(function(result){
     var html = result.value
-      .replaceAll('[<][/]h4[>](\s|<br>)*[<]h4[>]', '\n'); //Remove all consecutive whitespace between tags
+      .replace(/[<][/]h4[>](\s|<br>)*[<]h4[>]/g, '\n'); //Remove all consecutive whitespace between tags
     var messages = result.messages; // Any messages, such as warnings during conversion
     
     const $ = cheerio.load(html);
@@ -102,42 +119,96 @@ function getCards(docx) {
   });
 }
 
-function newCardDB(name, docxPath) {
+function getCardsFromJson(json) {
+  const fs = window.bypass.fs;
+  var cards = JSON.parse(fs.readFileSync(json)).cards;
+  return cards.map(card => new Card(card.tag, card.cite, card.text, card.stats));
+}
 
-  return getCards(docxPath).then(cards => {
+function loadDBs() {
+  const fs = window.bypass.fs;
+
+  if (fs.existsSync('src/assets/cards/databases.json')) {
+    cardDatabases = JSON.parse(fs.readFileSync('src/assets/cards/databases.json'))
+      .map(obj => new CardDB(new CardDBIdentifier(obj.name, obj.internalName), obj.description, null));
+
+  }
+}
+
+function findDB(id) {
+  return cardDatabases.find(db => (db.id.name == id.name && db.id.internalName == id.internalName));
+}
+
+function getDBs() {
+  return cardDatabases;
+}
+
+function saveDBs() {
+  const fs = window.bypass.fs;
+
+  fs.writeFileSync(
+    'src/assets/cards/databases.json',
+    JSON.stringify(cardDatabases.map(db => {
+      return {
+        name: db.id.name,
+        internalName: db.id.internalName,
+        description: db.description
+      };
+    })),
+    err => {}
+  );
+}
+
+function newCardDB(name, description, docxPath) {
+  const fs = window.bypass.fs;
+
+  return getCardsFromDocx(docxPath, window.bypass.fs.readFileSync(docxPath)).then(cards => {
 
     var internalName = `db-${fs.readdirSync('src/assets/cards/userdbs').length}`;
-    var db = new CardDB(name, internalName, cards);
+    var db = new CardDB(new CardDBIdentifier(name, internalName), description, cards);
     cardDatabases.push(db);
-    return db;
-
-  }).then(db => {
 
     fs.writeFileSync(
-      `src/assets/cards/userdbs/${db.internalName}.cards`,
+      `src/assets/cards/userdbs/${db.id.internalName}.cards`,
       JSON.stringify(db),
       err => {}
     );
 
-  }).then(db => {
+    saveDBs();
 
-    fs.writeFileSync(
-      'src/assets/cards/databases.json',
-      JSON.stringify(cardDatabases.map(db => {
-        return {
-          name: db.name,
-          internalName: db.internalName
-        };
-      })),
-      err => {}
-    );
     return db;
-    
-  })
+
+  });
+}
+
+function removeDB(id) {
+  console.log(id);
+  var removed = [];
+  cardDatabases = cardDatabases.filter(db => {
+    var keep = (db.id.name != id.name || db.id.internalName != id.internalName);
+    if (!keep)
+      removed.push(db);
+    return keep;
+  });
+
+  saveDBs();
+
+  const fs = window.bypass.fs;
+  removed.forEach(db => {
+    fs.unlinkSync(`src/assets/cards/userdbs/${db.id.internalName}.cards`);
+  });
 }
 
 export default {
-  getCards: getCards,
+  getCardsFromDocx: getCardsFromDocx,
+
   newCardDB: newCardDB,
-  Card: Card
+  loadDBs: loadDBs,
+  findDB: findDB,
+  getDBs: getDBs,
+  removeDB: removeDB,
+
+  CardDB: CardDB,
+  Card: Card,
+  CardDBIdentifier: CardDBIdentifier
 };

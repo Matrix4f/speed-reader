@@ -1,25 +1,19 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import StartupScreen from './startup-screen';
+
+import './semantic/dist/semantic.min.css';
+import { Button, Card, Image, Container, CardGroup } from 'semantic-ui-react';
+import SelectDrillScreen from './select-drill-screen';
+import fs from 'fs';
+import cards from './cards';
 
 class App extends Component {
+
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <SelectDrillScreen />
       </div>
     );
   }

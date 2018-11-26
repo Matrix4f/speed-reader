@@ -11,54 +11,88 @@ function calculateWordCount(s){
         .filter(function(str){return str!="";}).length;
 }
 
+function reverseWords(input, options) {
+  if (input.includes('Immigration restrictions give China'))
+    console.log(input);
+  var reversed = input;
+  
+  if (!options.noHL)
+    reversed = reversed.replace(/[(][(]hl[)][)]/g, ' ((hlend)) ')
+      .replace(/[(][(][/]hl[)][)]/g, ' ((hl)) ')
+      .replace(/[(][(]hlend[)][)]/g, ' ((/hl)) ');
+  
+  if (!options.noUL)
+    reversed = reversed.replace(/[(][(]ul[)][)]/g, ' ((ulend)) ')
+      .replace(/[(][(][/]ul[)][)]/g, ' ((ul)) ')
+      .replace(/[(][(]ulend[)][)]/g, ' ((/ul)) ');
+
+
+  if (input.includes('Immigration restrictions give China')){
+    console.log(input);
+    console.log(input.split(/[ ]/g));
+  }
+  reversed = reversed.split(/[ ]/g)
+    .reverse()
+    .join(' ');
+
+  if (input.includes('Immigration restrictions give China'))
+    console.log(reversed);
+  return reversed;
+}
+
 class Card {
-    constructor(tag, cite, text, stats={highlightedWords: this.calculateHighlightedWords(text)}) {
-        this.tag = tag;
-        this.cite = cite;
-        this.text = text;
-        this.stats = stats;
-    }
+  constructor(tag, cite, text, stats={highlightedWords: this.calculateHighlightedWords(text)}) {
+    this.tag = tag;
+    this.cite = cite;
+    this.text = text;
+    this.stats = stats;
+  }
 
-    calculateHighlightedWords(text) {
-        var highlightedWords = 0;
-        text.forEach(paragraph => {
-            paragraph = paragraph.replace(/[(][(][/]{0,1}ul[)][)]/g, '');;
-            var start = paragraph.indexOf('((hl))');
-            
-            while (start != -1) {
-                var end = paragraph.indexOf('((/hl))', start);
+  calculateHighlightedWords(text) {
+    var highlightedWords = 0;
+    text.forEach(paragraph => {
+      paragraph = paragraph.replace(/[(][(][/]{0,1}ul[)][)]/g, '');;
+      var start = paragraph.indexOf('((hl))');
+      
+      while (start != -1) {
+        var end = paragraph.indexOf('((/hl))', start);
 
-                var data = paragraph.substring(start+6,end);
-                highlightedWords += calculateWordCount(data);
+        var data = paragraph.substring(start+6,end);
+        highlightedWords += calculateWordCount(data);
 
-                start = paragraph.indexOf('((hl))', end);
-            }
-        });
-        return highlightedWords;
-    }
+        start = paragraph.indexOf('((hl))', end);
+      }
+    });
+    return highlightedWords;
+  }
 
-    isValidCard() {
-        return this.stats.highlightedWords > 2;
-    }
+  isValidCard() {
+    return this.stats.highlightedWords > 2;
+  }
 
-    htmlify(text, noHL, noUL) {
-        return text.replace(/[(][(]hl[)][)]/g, noHL ? '' : "<span class='card-highlight'>")
-            .replace(/[(][(][/]hl[)][)]/g, noHL ? '' : "</span>")
-            .replace(/[(][(]ul[)][)]/g, noUL ? '' : "<span class='card-underline'>")
-            .replace(/[(][(][/]ul[)][)]/g, noUL ? '' : "</span>");
-    }
+  htmlify(text, options) {
+    if (options.reverse)
+      text = reverseWords(text, options);
 
-    htmlifyBody(options) {
-        return `<p>${this.htmlify(this.text.join('</p><p>'), options.noHL, options.noUL)}</p>`;
-    }
+    text = text.replace(/[(][(]hl[)][)]/g, options.noHL ? '' : "<span class='card-highlight'>")
+      .replace(/[(][(][/]hl[)][)]/g, options.noHL ? '' : "</span>")
+      .replace(/[(][(]ul[)][)]/g, options.noUL ? '' : "<span class='card-underline'>")
+      .replace(/[(][(][/]ul[)][)]/g, options.noUL ? '' : "</span>");
 
-    toHTML(options) {
-        return `<div class='card'>` + 
-            `<div class='tag'>${this.htmlify(this.tag, options.noHL, options.noUL)}</div>` + 
-            `<div class='cite'>${this.htmlify(this.cite, options.noHL, options.noUL)}</div>` + 
-            `<div class='card-body'>${this.htmlifyBody(options)}</div>` + 
-        `</div>`;
-    }
+    return text;
+  }
+
+  htmlifyBody(options) {
+      return `<p>${this.text.map(text => this.htmlify(text, options)).join('</p><p>')}</p>`;
+  }
+
+  toHTML(options) {
+    return `<div class='card'>
+      ${options.tag ? `<div class='tag'>${this.htmlify(this.tag, options)}</div>` : ``}
+      ${options.cite ? `<div class='cite'>${this.htmlify(this.cite, options)}</div>` : ``}
+      ${options.body ? `<div class='card-body'>${this.htmlifyBody(options)}</div>` : ``}
+    </div>`;
+  }
 }
 
 class CardDBIdentifier {
@@ -70,9 +104,11 @@ class CardDBIdentifier {
 
 class CardDB {
 
-  constructor(id, description, cards) {
+  constructor(id, filepath, description, selected, cards) {
     this.id = id;
+    this.filepath = filepath;
     this.description = description;
+    this.selected = selected;
     this.cards = cards;
   }
 
@@ -130,7 +166,7 @@ function loadDBs() {
 
   if (fs.existsSync('src/assets/cards/databases.json')) {
     cardDatabases = JSON.parse(fs.readFileSync('src/assets/cards/databases.json'))
-      .map(obj => new CardDB(new CardDBIdentifier(obj.name, obj.internalName), obj.description, null));
+      .map(obj => new CardDB(new CardDBIdentifier(obj.name, obj.internalName), obj.filepath, obj.description, obj.selected, null));
 
   }
 }
@@ -152,7 +188,9 @@ function saveDBs() {
       return {
         name: db.id.name,
         internalName: db.id.internalName,
-        description: db.description
+        description: db.description,
+        filepath: db.filepath,
+        selected: db.selected
       };
     })),
     err => {}
@@ -164,8 +202,9 @@ function newCardDB(name, description, docxPath) {
 
   return getCardsFromDocx(docxPath, window.bypass.fs.readFileSync(docxPath)).then(cards => {
 
+
     var internalName = `db-${fs.readdirSync('src/assets/cards/userdbs').length}`;
-    var db = new CardDB(new CardDBIdentifier(name, internalName), description, cards);
+    var db = new CardDB(new CardDBIdentifier(name, internalName), docxPath, description, true, cards);
     cardDatabases.push(db);
 
     fs.writeFileSync(
@@ -207,6 +246,7 @@ export default {
   findDB: findDB,
   getDBs: getDBs,
   removeDB: removeDB,
+  saveDBs: saveDBs,
 
   CardDB: CardDB,
   Card: Card,

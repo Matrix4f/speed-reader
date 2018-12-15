@@ -7,6 +7,14 @@ import { Table, Button, Header } from 'semantic-ui-react';
 
 import cards from './cards';
 
+function shuffle(a) {
+  for (var i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 class ReaderScreen extends React.Component {
 
   constructor(props) {
@@ -20,8 +28,10 @@ class ReaderScreen extends React.Component {
       highlight: options.highlight,
       readForward: options.readForward,
       cardsFrom: options.cardsFrom,
+      
+      cards: [],
 
-      cards: []
+      renderAdditionalFeatures: options.renderAdditionalFeatures
     };
 
     this.state.dbs = this.state.cardsFrom.map(cards.findDB);
@@ -30,6 +40,8 @@ class ReaderScreen extends React.Component {
     this.state.dbs.forEach(db => {
       this.state.cards = this.state.cards.concat(db.cards);
     });
+    if (options.shuffle)
+      shuffle(this.state.cards);
 
     this.getHTML = this.getHTML.bind(this);
     this.scrollDown = this.scrollDown.bind(this);
@@ -99,7 +111,7 @@ class ReaderScreen extends React.Component {
           <Table.Row>
             <Table.Cell width={1}><Button basic size='massive' icon='angle left' onClick={this.scrollUp}/></Table.Cell>
             <Table.Cell width={14}><div dangerouslySetInnerHTML={{__html: this.getHTML()}} id="reader" className="reader"></div></Table.Cell>
-            <Table.Cell width={1}><Button basic size='massive' icon='angle right' style={{float: 'right'}} onClick={this.scrollDown} /></Table.Cell>
+            <Table.Cell width={1}><Button basic size='massive' icon='angle right' onClick={this.scrollDown} /></Table.Cell>
           </Table.Row>
         </Table>
       </div>

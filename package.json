@@ -1,6 +1,7 @@
 {
   "name": "speed-reader",
   "version": "0.1.0",
+  "author": "Soham Govande",
   "main": "src/app-client.js",
   "private": true,
   "dependencies": {
@@ -19,6 +20,7 @@
     "css-loader": "1.0.0",
     "dotenv": "6.0.0",
     "dotenv-expand": "4.2.0",
+    "electron-is-dev": "^1.0.1",
     "eslint": "5.6.0",
     "eslint-config-react-app": "^3.0.5",
     "eslint-loader": "2.1.1",
@@ -63,7 +65,8 @@
     "start": "node scripts/start.js",
     "startClient": "electron src/app-client.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "dev": "node src/electron-wait-react.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -119,5 +122,18 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "foreman": "^3.0.1"
+  },
+  "build": {
+    "appId": "me.matrix4f",
+    "asar": false,
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   }
 }

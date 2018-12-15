@@ -11,17 +11,20 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    // cards.loadDBs();
+    cards.loadDBs();
     this.state = {
       // scene: 'reader',
       // sceneOptions: {
-        // highlight: true,
-        // readForward: true,
-        // cardsFrom: [
-          // new cards.CardDBIdentifier('2AC Case', 'db-1')
-        // ]
+      //   highlight: true,
+      //   readForward: true,
+      //   cardsFrom: [
+      //     new cards.CardDBIdentifier('1AC Case', 'db-0'),
+      //     new cards.CardDBIdentifier('2AC Case', 'db-1'),
+      //     // new cards.CardDBIdentifier('2AC Kritik Answers', 'db-2'),
+      //     // new cards.CardDBIdentifier('2AC CP Answers', 'db-3'),
+      //   ]
       // },
-      scene: 'startup',
+      scene: 'selectDrillScreen',
       sceneMap: {
         startup: StartupScreen,
         selectDrillScreen: SelectDrillScreen,

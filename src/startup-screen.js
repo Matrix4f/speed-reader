@@ -5,7 +5,7 @@ import exampleParagraph from './assets/example-paragraph.png';
 import bg from './assets/background-cards.png';
 
 import './semantic/dist/semantic.min.css';
-import { Button, Card, Image, Container, CardGroup, Header } from 'semantic-ui-react';
+import { Button, Card, Image, Container, CardGroup, Header, Menu, Form } from 'semantic-ui-react';
 
 class SpreadCard extends React.Component {
 
@@ -62,7 +62,7 @@ class WPMCard extends React.Component {
   }
 }
 
-class MenuItems extends React.Component {
+class HomeMenuContents extends React.Component {
 
   constructor(props) {
     super(props);
@@ -74,12 +74,114 @@ class MenuItems extends React.Component {
   render() {
     return (
       <div>
+        <Header as='h2' textAlign='center'>Drills</Header>
         <Container textAlign='center'>
           <CardGroup centered>
             <SpreadCard setSceneCallback={this.state.setSceneCallback}/>
             <WPMCard setSceneCallback={this.state.setSceneCallback}/>
           </CardGroup>
         </Container>
+      </div>
+    );
+  }
+}
+
+class PrefsMenuContents extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      color: 'yellow'
+    };
+  }
+
+  selectColor = (e, { value }) => this.setState({ color: value });
+
+  render() {
+    const color = this.state.color;
+    return (
+      <div>
+        <Header as='h2' textAlign='center'>Preferences</Header>
+        <Form>
+          <Form.Group inline>
+            <label>Size</label>
+            <Form.Radio
+              label='Yellow'
+              value='yellow'
+              checked={color === 'yellow'}
+              onChange={this.selectColor}
+            />
+            <Form.Radio
+              label='Blue'
+              value='blue'
+              checked={color === 'blue'}
+              onChange={this.selectColor}
+            />
+            <Form.Radio
+              label='Green'
+              value='green'
+              checked={color === 'green'}
+              onChange={this.selectColor}
+            />
+          </Form.Group>
+        </Form>
+      </div>
+    );
+  }
+}
+
+class HeaderMenu extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      setSceneCallback: props.setSceneCallback,
+      selectedItem: 'home'
+    };
+    this.selectItem = this.selectItem.bind(this);
+    this.renderMenuChildren = this.renderMenuChildren.bind(this);
+  }
+
+  selectItem(e, name) {
+    e.preventDefault();
+    this.setState({ selectedItem: name });
+  }
+
+  renderMenuChildren() {
+    if (this.state.selectedItem == 'home')
+      return <HomeMenuContents setSceneCallback={this.state.setSceneCallback}/>;
+    else if (this.state.selectedItem == 'preferences')
+      return <PrefsMenuContents />;
+  }
+
+  render() {
+    
+    return (
+      <div>
+        <Header as='h1' textAlign='center'>Speed Reader</Header>
+
+        <Menu pointing secondary>
+          <Menu.Item 
+            name='home'
+            onClick={e=> this.selectItem(e, 'home')}
+            active={this.state.selectedItem == 'home'} 
+          />
+          <Menu.Item 
+            name='preferences' 
+            onClick={e=> this.selectItem(e, 'preferences')} 
+            active={this.state.selectedItem == 'preferences'} 
+          />
+          <Menu.Item
+            name='help'
+            onClick={e=> this.selectItem(e, 'help')} 
+            active={this.state.selectedItem == 'help'} 
+          />
+          <Menu.Item
+            name='about'
+            onClick={e=> this.selectItem(e, 'about')}
+            active={this.state.selectedItem == 'about'} 
+          />
+        </Menu>
+
+        {this.renderMenuChildren()}
       </div>
     );
   }
@@ -100,9 +202,8 @@ class StartupScreen extends Component {
 
   render() {
     return (
-      <div className="ui raised very padded text container segment">
-        <Header as='h1' textAlign='center'>Speed Reader</Header>
-        <MenuItems setSceneCallback={this.state.setSceneCallback}/>
+      <div class="ui raised very padded text container segment">
+        <HeaderMenu setSceneCallback={this.state.setSceneCallback} />
       </div>
     );
   }

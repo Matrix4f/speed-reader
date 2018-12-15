@@ -12,8 +12,6 @@ function calculateWordCount(s){
 }
 
 function reverseWords(input, options) {
-  if (input.includes('Immigration restrictions give China'))
-    console.log(input);
   var reversed = input;
   
   if (!options.noHL)
@@ -27,16 +25,10 @@ function reverseWords(input, options) {
       .replace(/[(][(]ulend[)][)]/g, ' ((/ul)) ');
 
 
-  if (input.includes('Immigration restrictions give China')){
-    console.log(input);
-    console.log(input.split(/[ ]/g));
-  }
   reversed = reversed.split(/[ ]/g)
     .reverse()
     .join(' ');
 
-  if (input.includes('Immigration restrictions give China'))
-    console.log(reversed);
   return reversed;
 }
 
@@ -197,13 +189,20 @@ function saveDBs() {
   );
 }
 
+function newInternalName() {
+  var files = window.bypass.fs.readdirSync('src/assets/cards/userdbs');
+  var i = 0;
+  while (files.indexOf(`db-${i}.cards`) != -1)
+    i++;
+  return `db-${i}`;
+};
+
 function newCardDB(name, description, docxPath) {
   const fs = window.bypass.fs;
 
   return getCardsFromDocx(docxPath, window.bypass.fs.readFileSync(docxPath)).then(cards => {
 
-
-    var internalName = `db-${fs.readdirSync('src/assets/cards/userdbs').length}`;
+    var internalName = newInternalName();
     var db = new CardDB(new CardDBIdentifier(name, internalName), docxPath, description, true, cards);
     cardDatabases.push(db);
 

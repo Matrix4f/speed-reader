@@ -25,14 +25,14 @@ class SpreadCard extends React.Component {
   render() {
     return (
       <Card>
-      <Image src={exampleParagraph} />
-      <Card.Content>
-        <Card.Header>Spreading</Card.Header>
-        <Card.Description>Practice with some drills</Card.Description>
-      </Card.Content>
-      <Card.Content extra>
-        <Button fluid primary onClick={this.execute} content='Start'/>
-      </Card.Content>
+        <Image src={exampleParagraph} />
+        <Card.Content>
+          <Card.Header>Spreading</Card.Header>
+          <Card.Description>Practice with some drills</Card.Description>
+        </Card.Content>
+        <Card.Content extra>
+          <Button fluid primary onClick={this.execute} content='Start'/>
+        </Card.Content>
       </Card>
     );
   }
@@ -74,7 +74,7 @@ class HomeMenuContents extends React.Component {
   render() {
     return (
       <div>
-        <Header as='h2' textAlign='center'>Drills</Header>
+        <Header as='h2' textAlign='center'>Home</Header>
         <Container textAlign='center'>
           <CardGroup centered>
             <SpreadCard setSceneCallback={this.state.setSceneCallback}/>

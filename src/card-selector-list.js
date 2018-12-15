@@ -114,9 +114,9 @@ class CardsSelectorList extends Component {
 
   render() {
     return (
-      <List divided size='large'>
-        {this.state.elements.map(this.renderCardListElement)}
+      <List divided size='large' id="cardSelectorList">
         <ImportCardsListElement addCardCallback={this.addCardListElement}/>
+        {this.state.elements.map(this.renderCardListElement)}
       </List>
     );
   }

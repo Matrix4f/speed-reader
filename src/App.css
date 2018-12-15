@@ -12,6 +12,14 @@
   margin: 0px 0px 0px 0px;
 }
 
+#cardSelectorList {
+
+  display: block;
+  height: calc(40vh);
+  overflow: auto;
+
+}
+
 ::-webkit-scrollbar {
   width: 0px;  /* remove scrollbar space */
 }

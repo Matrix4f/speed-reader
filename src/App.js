@@ -24,7 +24,7 @@ class App extends Component {
         ]
       },
       // scene: 'reader',
-      scene: 'startup',
+      scene: 'selectDrillScreen',
       sceneMap: {
         startup: StartupScreen,
         selectDrillScreen: SelectDrillScreen,

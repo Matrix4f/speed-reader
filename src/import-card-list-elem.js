@@ -44,7 +44,7 @@ class ImportCardsListElement extends Component {
         <List.Content>
             <List.Header>New</List.Header>
             <List.Description>
-              Import cards to read from a particular word document (.docx file)
+              Import cards to read from a Word doc (.docx file)
             </List.Description>
         </List.Content>
       </List.Item>

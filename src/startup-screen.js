@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './App.css';
 
 import exampleParagraph from './assets/example-paragraph.png';
-import bg from './assets/maxresdefault.jpg';
+import bg from './assets/background.jpg';
 
 import './semantic/dist/semantic.min.css';
 import { Button, Card, Image, Container, CardGroup, Header, Menu, Form } from 'semantic-ui-react';

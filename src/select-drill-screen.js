@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './App.css';
 
 import './semantic/dist/semantic.min.css';
-import { Button, Checkbox, Icon, Form, Placeholder } from 'semantic-ui-react';
+import { Button, Checkbox, Icon, Form, Header } from 'semantic-ui-react';
 
 import cards from './cards';
 import CardsSelectorList from './card-selector-list';
@@ -29,9 +29,11 @@ class SelectDrillScreen extends Component {
     };
   }
 
-  toggleHighlights = (e, { value }) => this.setState({ highlight: !this.state.highlight })
-  toggleReadForward = (e, { value }) => this.setState({ readForward: !this.state.readForward })
-  toggleShuffle = (e, { value }) => this.setState({ shuffle: !this.state.shuffle })
+  toggleHighlights = (e, { value }) => this.setState({ highlight: !this.state.highlight });
+  toggleReadForward = (e, { value }) => this.setState({ readForward: !this.state.readForward });
+  toggleShuffle = (e, { value }) => this.setState({ shuffle: !this.state.shuffle });
+
+  showStartScreen = (e) => this.state.setSceneCallback('startup', {});
 
   UNSAFE_componentWillMount() {
     const fs = window.bypass.fs;
@@ -76,8 +78,9 @@ class SelectDrillScreen extends Component {
     this.state.setSceneCallback('reader', {
       highlight: this.state.highlight,
       readForward: this.state.readForward,
+      shuffle: this.state.shuffle,
+      
       cardsFrom: cardsFrom,
-      shuffle: true,
       renderAdditionalFeatures: () => {}
     });
   }
@@ -93,7 +96,7 @@ class SelectDrillScreen extends Component {
   renderReadingDirectionButton() {
     return (
       <Form.Field>
-        <Checkbox label='Read backward' onClick={this.toggleReadForward} checked={this.state.readForward}/>
+        <Checkbox label='Read backward' onClick={this.toggleReadForward} checked={!this.state.readForward}/>
       </Form.Field>
     );
   }
@@ -109,7 +112,10 @@ class SelectDrillScreen extends Component {
   render() {
     return (
     <div className="ui very padded text left aligned container segment">
-      <h1 className="ui header">Options</h1>
+    
+      <Header as="h1">
+        Options
+      </Header>
 
       <Form>
       
@@ -119,15 +125,25 @@ class SelectDrillScreen extends Component {
 
         <h3 className="ui header">Cards from</h3>
         <CardsSelectorList setElementsCallback={this.setElementsCallback}/>
-        <Button
-          positive
-          icon
-          labelPosition="right"
-          onClick={this.moveToNextScreen}
-        >
-          Begin
-          <Icon name='right arrow' />
-        </Button>
+        
+        <Button.Group>
+          <Button
+              icon
+              labelPosition="left"
+              onClick={this.showStartScreen}>
+              Back
+              <Icon name='left arrow' />
+          </Button>
+          <Button.Or />
+          <Button
+            positive
+            icon
+            labelPosition="right"
+            onClick={this.moveToNextScreen}>
+            Begin
+            <Icon name='right arrow' />
+          </Button>
+        </Button.Group>
       </Form>
       
     </div>

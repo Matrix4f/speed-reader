@@ -13,18 +13,18 @@ class App extends Component {
 
     cards.loadDBs();
     this.state = {
+      sceneOptions: {
+        highlight: true,
+        readForward: true,
+        cardsFrom: [
+          new cards.CardDBIdentifier('1AC Case', 'db-0'),
+          new cards.CardDBIdentifier('2AC Case', 'db-1'),
+          // new cards.CardDBIdentifier('2AC Kritik Answers', 'db-2'),
+          // new cards.CardDBIdentifier('2AC CP Answers', 'db-3'),
+        ]
+      },
       // scene: 'reader',
-      // sceneOptions: {
-      //   highlight: true,
-      //   readForward: true,
-      //   cardsFrom: [
-      //     new cards.CardDBIdentifier('1AC Case', 'db-0'),
-      //     new cards.CardDBIdentifier('2AC Case', 'db-1'),
-      //     // new cards.CardDBIdentifier('2AC Kritik Answers', 'db-2'),
-      //     // new cards.CardDBIdentifier('2AC CP Answers', 'db-3'),
-      //   ]
-      // },
-      scene: 'selectDrillScreen',
+      scene: 'startup',
       sceneMap: {
         startup: StartupScreen,
         selectDrillScreen: SelectDrillScreen,

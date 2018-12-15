@@ -59,7 +59,7 @@ class Card {
   }
 
   isValidCard() {
-    return this.stats.highlightedWords > 2;
+    return true; //TODO change to > 2
   }
 
   htmlify(text, options) {

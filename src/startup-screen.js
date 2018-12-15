@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './App.css';
 
 import exampleParagraph from './assets/example-paragraph.png';
-import bg from './assets/background-cards.png';
+import bg from './assets/maxresdefault.jpg';
 
 import './semantic/dist/semantic.min.css';
 import { Button, Card, Image, Container, CardGroup, Header, Menu, Form } from 'semantic-ui-react';
@@ -198,6 +198,11 @@ class StartupScreen extends Component {
 
   componentWillMount() {
     document.body.style.backgroundImage = 'url(' + bg + ')';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundRepeat = 'no-repeat';
+    document.body.style.backgroundAttachment = 'fixed';
+     
   }
 
   render() {

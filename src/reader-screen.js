@@ -52,13 +52,14 @@ class ReaderScreen extends React.Component {
   getHTML() {
     var html = `
       <style>
-        .card-highlight { background-color: yellow; font-size: 120%; }
+        .card-highlight { background-color: #8CD7FF; }
         .card-underline { text-decoration: underline; }
         .tag { font-weight: bold; font-size: 140%; }
         .cite { font-weight: bold; font-size: 130%;}
-        .card-body { }
-        body { font-family: 'Calibri', 'Arial', 'Times New Roman'; }
-        ::-webkit-scrollbar { display: none; }
+        body { font-family: 'Calibri', 'Arial', 'Times New Roman'; font-size: 110%; }
+        .card-body .card-underline { font-size: 115%; }
+        .card-body .card-highlight { font-size: 105%; }
+        /*::-webkit-scrollbar { display: none; }*/
       </style>
     `;
     this.state.cards.forEach(card => {
@@ -69,10 +70,12 @@ class ReaderScreen extends React.Component {
         reverse: !this.state.readForward,
         noHL: !this.state.highlight,
         noUL: false 
-      });
+      }) + '<br><br>';
     });
     return html;
   }
+
+  showDrillScreen = (e) => this.state.setSceneCallback('selectDrillScreen', {})
 
   scroll(multiplier) {
     var elem = document.getElementById('reader');
@@ -95,7 +98,6 @@ class ReaderScreen extends React.Component {
   }
 
   componentWillMount() {
-    document.body.style.backgroundImage = null;
     document.addEventListener('keydown', this.keyPress);
   }
 
@@ -106,8 +108,16 @@ class ReaderScreen extends React.Component {
   render() {
     return (
       <div className="ui left aligned container segment" style={{backgroundColor: '#f6f6f6'}}>
-        <Header as='h1' textAlign='center'>Reader View</Header>
         <Table>
+          <Table.Row>
+            <Table.Cell>
+              <Button icon='arrow left' basic onClick={this.showDrillScreen} />
+            </Table.Cell>
+            <Table.Cell>
+              <Header as='h1' textAlign='center'>Doc View</Header>
+            </Table.Cell>
+          </Table.Row>
+          
           <Table.Row>
             <Table.Cell width={1}><Button basic size='massive' icon='angle left' onClick={this.scrollUp}/></Table.Cell>
             <Table.Cell width={14}><div dangerouslySetInnerHTML={{__html: this.getHTML()}} id="reader" className="reader"></div></Table.Cell>

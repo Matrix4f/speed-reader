@@ -14,13 +14,9 @@ class SpreadCard extends React.Component {
     this.state = {
       setSceneCallback: props.setSceneCallback
     };
-
-    this.execute = this.execute.bind(this);
   }
 
-  execute(e) {
-    this.state.setSceneCallback('selectDrillScreen', {});
-  }
+  execute = (e, { value }) => this.state.setSceneCallback('selectDrillScreen', { nextScene: 'reader', displayWPMOptions: false });
 
   render() {
     return (
@@ -46,6 +42,8 @@ class WPMCard extends React.Component {
     };
   }
 
+  execute = (e, { value }) => this.state.setSceneCallback('selectDrillScreen', { nextScene: 'reader', displayWPMOptions: true });
+
   render() {
     return (
       <Card>
@@ -55,7 +53,7 @@ class WPMCard extends React.Component {
             <Card.Description>650 wpm 650 iq</Card.Description>
         </Card.Content>
         <Card.Content extra>
-          <Button fluid content='Take the Test' secondary />
+          <Button fluid content='Take the Test' secondary onClick={this.execute}/>
         </Card.Content>
       </Card>
     );
@@ -86,44 +84,16 @@ class HomeMenuContents extends React.Component {
   }
 }
 
-class PrefsMenuContents extends React.Component {
+class WPMReportsMenuContents extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      color: 'yellow'
-    };
   }
 
-  selectColor = (e, { value }) => this.setState({ color: value });
-
   render() {
-    const color = this.state.color;
     return (
       <div>
-        <Header as='h2' textAlign='center'>Preferences</Header>
-        <Form>
-          <Form.Group inline>
-            <label>Size</label>
-            <Form.Radio
-              label='Yellow'
-              value='yellow'
-              checked={color === 'yellow'}
-              onChange={this.selectColor}
-            />
-            <Form.Radio
-              label='Blue'
-              value='blue'
-              checked={color === 'blue'}
-              onChange={this.selectColor}
-            />
-            <Form.Radio
-              label='Green'
-              value='green'
-              checked={color === 'green'}
-              onChange={this.selectColor}
-            />
-          </Form.Group>
-        </Form>
+        <Header as='h2' textAlign='center'>WPM Rpeports</Header>
+        
       </div>
     );
   }
@@ -148,8 +118,8 @@ class HeaderMenu extends React.Component {
   renderMenuChildren() {
     if (this.state.selectedItem == 'home')
       return <HomeMenuContents setSceneCallback={this.state.setSceneCallback}/>;
-    else if (this.state.selectedItem == 'preferences')
-      return <PrefsMenuContents />;
+    else if (this.state.selectedItem == 'wpm')
+      return <WPMReportsMenuContents />;
   }
 
   render() {
@@ -165,9 +135,9 @@ class HeaderMenu extends React.Component {
             active={this.state.selectedItem == 'home'} 
           />
           <Menu.Item 
-            name='preferences' 
-            onClick={e=> this.selectItem(e, 'preferences')} 
-            active={this.state.selectedItem == 'preferences'} 
+            name='WPM Reports' 
+            onClick={e=> this.selectItem(e, 'WPM Reports')} 
+            active={this.state.selectedItem == 'WPM Reports'} 
           />
           <Menu.Item
             name='help'

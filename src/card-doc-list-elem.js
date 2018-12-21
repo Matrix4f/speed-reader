@@ -68,10 +68,10 @@ class CardDocumentListElement extends Component {
   }
 
   componentDidMount() {
-    this.setState({
-      popupVisible: this.state.isNewElement,
-      popupContent: 'Imported cards'
-    });
+    // this.setState({
+    //   popupVisible: this.state.isNewElement,
+    //   popupContent: 'Imported cards'
+    // });
   }
 
   render() {

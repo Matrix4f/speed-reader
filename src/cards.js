@@ -4,11 +4,11 @@ const mammoth = require('mammoth');
 var cardDatabases = [];
 
 function calculateWordCount(s){
-    return s.replace(/(^\s*)|(\s*$)/gi,"") //exclude  start and end white-space
-        .replace(/[^\s\w&]/g, '')
-        .replace(/[\s]{2,}/gi," ") //2 or more space to 1
-        .split(' ')
-        .filter(function(str){return str!="";}).length;
+  return s.replace(/(^\s*)|(\s*$)/gi,"") //exclude  start and end white-space
+    .replace(/[^\s\w&]/g, '')
+    .replace(/[\s]{2,}/gi," ") //2 or more space to 1
+    .split(' ')
+    .filter(function(str){return str!="";}).length;
 }
 
 function reverseWords(input, options) {
@@ -56,6 +56,24 @@ class Card {
       }
     });
     return highlightedWords;
+  }
+
+  calculateTotalWords(text) {
+    return calculateWordCount(
+      text.replace(/[(][(][/]{0,1}ul[)][)]/g, '')
+        .replace(/[(][(][/]{0,1}hl[)][)]/g, '')
+    );
+  }
+
+  getWordCount(highlightedOnly) {
+    var bodyCount = highlightedOnly ? this.stats.highlightedWords : 0;
+    const tagCount = calculateWordCount(this.tag);
+    
+    if (!highlightedOnly) {
+      this.text.forEach(paragraph => {bodyCount += this.calculateTotalWords(paragraph);});
+    }
+    console.log("BodyCount: " + bodyCount + " TagCount: " + tagCount)
+    return tagCount + bodyCount;
   }
 
   isValidCard() {

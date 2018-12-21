@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './App.css';
 
 import './semantic/dist/semantic.min.css';
-import { Button, Checkbox, Icon, Form, Header } from 'semantic-ui-react';
+import { Button, Checkbox, Icon, Form, Header, Dropdown, Menu } from 'semantic-ui-react';
 
 import cards from './cards';
 import CardsSelectorList from './card-selector-list';
@@ -24,6 +24,8 @@ class SelectDrillScreen extends Component {
       highlight: true,
       shuffle: false,
 
+      nextScene: props.sceneOptions.nextScene,
+      displayWPMOptions: props.sceneOptions.displayWPMOptions,
       setSceneCallback: props.setSceneCallback,
       elements: []
     };
@@ -32,8 +34,9 @@ class SelectDrillScreen extends Component {
   toggleHighlights = (e, { value }) => this.setState({ highlight: !this.state.highlight });
   toggleReadForward = (e, { value }) => this.setState({ readForward: !this.state.readForward });
   toggleShuffle = (e, { value }) => this.setState({ shuffle: !this.state.shuffle });
+  setPreferredWords = (e, { value }) => this.setState({ preferredWords: value });
 
-  showStartScreen = (e) => this.state.setSceneCallback('startup', {});
+  showStartScreen = (e) => {this.state.setSceneCallback('startup', {});}
 
   UNSAFE_componentWillMount() {
     const fs = window.bypass.fs;
@@ -41,7 +44,8 @@ class SelectDrillScreen extends Component {
     this.setState({
       readForward: obj.readForward,
       highlight: obj.highlight,
-      shuffle: obj.shuffle
+      shuffle: obj.shuffle,
+      preferredWords: obj.preferredWords
     });
   }
 
@@ -52,7 +56,8 @@ class SelectDrillScreen extends Component {
       JSON.stringify({
         readForward: this.state.readForward,
         highlight: this.state.highlight,
-        shuffle: this.state.shuffle
+        shuffle: this.state.shuffle,
+        preferredWords: this.state.preferredWords
       }),
       err => {}
     );
@@ -75,10 +80,11 @@ class SelectDrillScreen extends Component {
         cardsFrom.push(id);
     });
 
-    this.state.setSceneCallback('reader', {
+    this.state.setSceneCallback(this.state.nextScene, {
       highlight: this.state.highlight,
       readForward: this.state.readForward,
       shuffle: this.state.shuffle,
+      preferredWords: (this.state.displayWPMOptions ? this.state.preferredWords : undefined),
       
       cardsFrom: cardsFrom,
       renderAdditionalFeatures: () => {}
@@ -109,6 +115,24 @@ class SelectDrillScreen extends Component {
     );
   }
 
+  displayWPMOptions() {
+    if (!this.state.displayWPMOptions)
+      return '';
+
+    return (
+      <Form.Group inline>
+        <label>Preferred Length</label>
+        <Dropdown defaultValue={this.state.preferredWords} selection options={[
+          { key: 1, text: '300 words', value: 300 },
+          { key: 2, text: '400 words', value: 400 },
+          { key: 3, text: '500 words', value: 500 },
+          { key: 4, text: '750 words', value: 750 },
+          { key: 5, text: '1000 words', value: 1000 },
+        ]} onChange={this.setPreferredWords}/>
+      </Form.Group>
+    );
+  }
+
   render() {
     return (
     <div className="ui very padded text left aligned container segment">
@@ -122,6 +146,7 @@ class SelectDrillScreen extends Component {
         {this.renderHighlightsButton()}
         {this.renderReadingDirectionButton()}
         {this.renderShuffleButton()}
+        {this.displayWPMOptions()}
 
         <h3 className="ui header">Cards from</h3>
         <CardsSelectorList setElementsCallback={this.setElementsCallback}/>

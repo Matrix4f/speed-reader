@@ -1,5 +1,3 @@
-**The commit history is a little bit messy, sorry about that.**
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
